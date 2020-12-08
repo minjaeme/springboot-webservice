@@ -17,11 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PostsRespositoryTest {
 
     @Autowired
-    PostsRespository postsRespository;
+    PostsRepository postsRepository;
 
     @After
     public void cleanup() {
-        postsRespository.deleteAll();
+        postsRepository.deleteAll();
     }
 
     @Test
@@ -30,14 +30,14 @@ public class PostsRespositoryTest {
         String title = "테스트 게시글";
         String content = "테스트 본문";
 
-        postsRespository.save(Posts.builder()
+        postsRepository.save(Posts.builder()
         .title(title)
         .content(content)
         .author("gmail.com")
         .build());
 
         //when
-        List<Posts> postsList = postsRespository.findAll();
+        List<Posts> postsList = postsRepository.findAll();
 
         //then
         Posts posts = postsList.get(0);
@@ -49,14 +49,14 @@ public class PostsRespositoryTest {
     public void BaseTimeEntity_등록() {
         //given
         LocalDateTime now = LocalDateTime.of(2019, 6, 4, 0, 0, 0);
-        postsRespository.save(Posts.builder()
+        postsRepository.save(Posts.builder()
         .title("title")
         .content("content")
         .author("author")
         .build());
 
         //when
-        List<Posts> postsList = postsRespository.findAll();
+        List<Posts> postsList = postsRepository.findAll();
 
         //then
         Posts posts = postsList.get(0);
