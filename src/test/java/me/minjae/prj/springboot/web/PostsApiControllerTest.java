@@ -1,5 +1,6 @@
 package me.minjae.prj.springboot.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.minjae.prj.springboot.domain.posts.Posts;
 import me.minjae.prj.springboot.domain.posts.PostsRepository;
 import me.minjae.prj.springboot.web.dto.PostsSaveRequestDto;
@@ -30,6 +31,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -42,12 +45,7 @@ public class PostsApiControllerTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private PostsRepository postRespository;
-
-    @After
-    public void tearDown() throws Exception {
-        postRespository.deleteAll();
-    }
+    private PostsRepository postRepository;
 
     @Autowired
     private WebApplicationContext context;
@@ -60,6 +58,11 @@ public class PostsApiControllerTest {
                 .webAppContextSetup(context)
                 .apply(springSecurity())
                 .build();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        postRepository.deleteAll();
     }
 
     @Test
@@ -75,16 +78,16 @@ public class PostsApiControllerTest {
                 .author("author")
                 .build();
 
-        String url = "http://localhost:" + port + "/api/v1/posts";
+        String url = "http://localhost:" + port + "/api/v1/posts/";
 
         //when
-        ResponseEntity<Long> responseEntity = restTemplate.postForEntity(url, requestDto, Long.class);
+        mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
 
         //then
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isGreaterThan(0L);
-
-        List<Posts> all = postRespository.findAll();
+        List<Posts> all = postRepository.findAll();
         assertThat(all.get(0).getTitle()).isEqualTo(title);
         assertThat(all.get(0).getContent()).isEqualTo(content);
     }
@@ -93,7 +96,7 @@ public class PostsApiControllerTest {
     @WithMockUser(roles="USER")
     public void Posts_수정된다() throws Exception {
         //given
-        Posts savedPosts = postRespository.save(Posts.builder()
+        Posts savedPosts = postRepository.save(Posts.builder()
                 .title("title")
                 .content("content")
                 .author("author")
@@ -114,14 +117,13 @@ public class PostsApiControllerTest {
         HttpEntity<PostsUpdateRequestDto> requestEntity = new HttpEntity<>(requestDto);
 
         //when
-        ResponseEntity<Long> responseEntity = restTemplate
-                .exchange(url, HttpMethod.PUT, requestEntity, Long.class);
+        mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
 
         //then
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isGreaterThan(0L);
-
-        List<Posts> all = postRespository.findAll();
+        List<Posts> all = postRepository.findAll();
         assertThat(all.get(0).getTitle()).isEqualTo(expectedTitle);
         assertThat(all.get(0).getContent()).isEqualTo(expectedContent);
     }
