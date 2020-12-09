@@ -1,7 +1,7 @@
 package me.minjae.prj.springboot.web;
 
 import lombok.RequiredArgsConstructor;
-import me.minjae.prj.springboot.domain.posts.PostsService;
+import me.minjae.prj.springboot.service.PostsService;
 import me.minjae.prj.springboot.web.dto.PostsListResponseDto;
 import me.minjae.prj.springboot.web.dto.PostsResponseDto;
 import me.minjae.prj.springboot.web.dto.PostsSaveRequestDto;

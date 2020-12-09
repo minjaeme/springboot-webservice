@@ -31,8 +31,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+// For mockMvc
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -45,7 +47,7 @@ public class PostsApiControllerTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private PostsRepository postRepository;
+    private PostsRepository postsRepository;
 
     @Autowired
     private WebApplicationContext context;
@@ -62,7 +64,7 @@ public class PostsApiControllerTest {
 
     @After
     public void tearDown() throws Exception {
-        postRepository.deleteAll();
+        postsRepository.deleteAll();
     }
 
     @Test
@@ -71,23 +73,22 @@ public class PostsApiControllerTest {
         //given
         String title = "title";
         String content = "content";
-        PostsSaveRequestDto requestDto = PostsSaveRequestDto
-                .builder()
+        PostsSaveRequestDto requestDto = PostsSaveRequestDto.builder()
                 .title(title)
                 .content(content)
                 .author("author")
                 .build();
 
-        String url = "http://localhost:" + port + "/api/v1/posts/";
+        String url = "http://localhost:" + port + "/api/v1/posts";
 
         //when
-        mvc.perform(put(url)
+        mvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(new ObjectMapper().writeValueAsString(requestDto)))
                 .andExpect(status().isOk());
 
         //then
-        List<Posts> all = postRepository.findAll();
+        List<Posts> all = postsRepository.findAll();
         assertThat(all.get(0).getTitle()).isEqualTo(title);
         assertThat(all.get(0).getContent()).isEqualTo(content);
     }
@@ -96,7 +97,7 @@ public class PostsApiControllerTest {
     @WithMockUser(roles="USER")
     public void Posts_수정된다() throws Exception {
         //given
-        Posts savedPosts = postRepository.save(Posts.builder()
+        Posts savedPosts = postsRepository.save(Posts.builder()
                 .title("title")
                 .content("content")
                 .author("author")
@@ -106,15 +107,12 @@ public class PostsApiControllerTest {
         String expectedTitle = "title2";
         String expectedContent = "content2";
 
-        PostsUpdateRequestDto requestDto =
-                PostsUpdateRequestDto.builder()
-                        .title(expectedTitle)
-                        .content(expectedContent)
-                        .build();
+        PostsUpdateRequestDto requestDto = PostsUpdateRequestDto.builder()
+                .title(expectedTitle)
+                .content(expectedContent)
+                .build();
 
         String url = "http://localhost:" + port + "/api/v1/posts/" + updateId;
-
-        HttpEntity<PostsUpdateRequestDto> requestEntity = new HttpEntity<>(requestDto);
 
         //when
         mvc.perform(put(url)
@@ -123,7 +121,7 @@ public class PostsApiControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        List<Posts> all = postRepository.findAll();
+        List<Posts> all = postsRepository.findAll();
         assertThat(all.get(0).getTitle()).isEqualTo(expectedTitle);
         assertThat(all.get(0).getContent()).isEqualTo(expectedContent);
     }

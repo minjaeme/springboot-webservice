@@ -1,6 +1,8 @@
-package me.minjae.prj.springboot.domain.posts;
+package me.minjae.prj.springboot.service;
 
 import lombok.RequiredArgsConstructor;
+import me.minjae.prj.springboot.domain.posts.Posts;
+import me.minjae.prj.springboot.domain.posts.PostsRepository;
 import me.minjae.prj.springboot.web.dto.PostsListResponseDto;
 import me.minjae.prj.springboot.web.dto.PostsResponseDto;
 import me.minjae.prj.springboot.web.dto.PostsSaveRequestDto;
@@ -14,7 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class PostsService {
-    private final PostsRepository postsRepository;
+        private final PostsRepository postsRepository;
 
     @Transactional
     public Long save(PostsSaveRequestDto requestDto) {

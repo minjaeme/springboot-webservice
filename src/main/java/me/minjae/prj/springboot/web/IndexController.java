@@ -2,16 +2,13 @@ package me.minjae.prj.springboot.web;
 
 import lombok.RequiredArgsConstructor;
 import me.minjae.prj.springboot.config.auth.LoginUser;
-import me.minjae.prj.springboot.domain.user.User;
 import me.minjae.prj.springboot.config.auth.dto.SessionUser;
-import me.minjae.prj.springboot.domain.posts.PostsService;
+import me.minjae.prj.springboot.service.PostsService;
 import me.minjae.prj.springboot.web.dto.PostsResponseDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import javax.servlet.http.HttpSession;
 
 @RequiredArgsConstructor
 @Controller
